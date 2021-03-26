@@ -1,6 +1,9 @@
 #include "solver.h"
 #include "mouse.h"
 
+#define TRUE 1;
+#define FALSE 0;
+
     int vertArray [16][17]= { 
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -96,15 +99,370 @@ Action floodFill(Mouse *mouse)
 {
     // TODO: Implement this function!
 
+    
 
    
-    printf("hello");
-    return IDLE;
-}
+   
+    updateWalls(mouse);
+    for (int i = 0; i < 16; i++ ){
+        for ( int j = 0; j < 17; j++)
+            printf("%d", vertArray[i][j]);
+        printf("\n");
+    }
 
-void updateWall(Mouse* mouse){
+    printf ("\n");
+
+    //check all three neighboring cells for min value
+    int min = getMinValOfNeighbors(mouse);
+    Heading heading = mouse->heading;
     int xCoord = mouse->x;
     int yCoord = mouse->y;
+
+    int man = manhattan[xCoord][yCoord];
+    int front = getFrontVal(heading, xCoord,yCoord);
+    int left = getLeftVal(heading, xCoord, yCoord);
+    int right = getRightVal(heading, xCoord, yCoord);
+
+    printf("Front is : %d \n Man is :  %d \n Min is : %d \n FrontAccess: %d", front, man, min ,  frontAccessible(heading,xCoord,yCoord));
+
+    if (front !=999 && front == min && front < man && frontAccessible(heading,xCoord,yCoord) )
+        return FORWARD;
+    else if(left !=999 && left == min && left < man && leftAccessible(heading,xCoord,yCoord))
+        return LEFT;
+    else if (right !=999 && right == min && left < man && rightAccessible(heading,xCoord,yCoord))
+        return RIGHT;
+    else
+        return IDLE;
+}
+
+int frontAccessible(Heading heading, int xCoord, int yCoord){
+    switch(heading){
+        case SOUTH:
+        {
+                if(horizArray[xCoord+1][yCoord]!= 1 )
+                    return TRUE;
+                break;
+         }
+        case EAST:
+        {
+                if(vertArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+        case WEST:
+        {
+                if(vertArray[xCoord][yCoord+1]!= 1 )
+                    return TRUE;
+                break;
+        }
+          case NORTH:
+        {
+                if(horizArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+
+    }
+    return FALSE;
+}
+
+int leftAccessible(Heading heading, int xCoord, int yCoord){
+    switch(heading){
+        case NORTH:
+        {
+                if(vertArray[xCoord][yCoord+1]!= 1 )
+                    return TRUE;
+                break;
+         }
+        case EAST:
+        {
+                if(horizArray[xCoord+1][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+        case WEST:
+        {
+                if(horizArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+          case SOUTH:
+        {
+                if(vertArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+
+    }
+    return FALSE;
+}
+
+int rightAccessible(Heading heading, int xCoord, int yCoord){
+    switch(heading){
+        case NORTH:
+        {
+                if(vertArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+         }
+        case EAST:
+        {
+                if(horizArray[xCoord][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+        case WEST:
+        {
+                if(horizArray[xCoord+1][yCoord]!= 1 )
+                    return TRUE;
+                break;
+        }
+          case SOUTH:
+        {
+                if(vertArray[xCoord][yCoord+1]!= 1 )
+                    return TRUE;
+                break;
+        }
+
+    }
+    return FALSE;
+}
+
+int getFrontVal(Heading heading,  int xCoord, int yCoord){
+     switch (heading){
+        case NORTH:
+            {   
+                //front
+                if(isInBounds (xCoord+1,yCoord))
+                    return manhattan[xCoord+1][yCoord];
+                break;
+
+            }
+         case EAST:
+            {   
+                //front
+                if(isInBounds (xCoord,yCoord-1))
+                    return manhattan[xCoord][yCoord-1];
+                break;
+            }
+         case WEST:
+            {   
+                //front
+                if(isInBounds (xCoord,yCoord+1))
+                    return manhattan[xCoord][yCoord+1];
+                break;
+              
+            }
+         case SOUTH:
+            {   
+                //front
+                if(isInBounds (xCoord-1,yCoord))
+                    return manhattan[xCoord-1][yCoord];
+                break;
+            }
+
+           
+
+    }
+ return 999;
+}
+
+int getLeftVal(Heading heading,  int xCoord, int yCoord){
+     switch (heading){
+        case SOUTH:
+            {  
+                if(isInBounds (xCoord,yCoord+1))
+                    return manhattan[xCoord][yCoord+1];
+                break;
+
+            }
+         case EAST:
+            {  
+                if(isInBounds (xCoord+1,yCoord))
+                    return manhattan[xCoord+1][yCoord];
+                break;
+            }
+         case WEST:
+            {   
+                if(isInBounds (xCoord-1,yCoord))
+                    return manhattan[xCoord-1][yCoord];
+                break;
+              
+            }
+         case NORTH:
+            {   
+                if(isInBounds (xCoord,yCoord-1))
+                    return manhattan[xCoord][yCoord-1];
+                break;
+            }
+
+
+    }
+    
+            return 999;
+}
+
+int getRightVal(Heading heading, int xCoord, int yCoord ){
+
+     switch (heading){
+        case SOUTH:
+            {  
+                if(isInBounds (xCoord,yCoord-1))
+                    return manhattan[xCoord][yCoord-1];
+                break;
+
+            }
+         case EAST:
+            {  
+                if(isInBounds (xCoord-1,yCoord))
+                    return manhattan[xCoord-1][yCoord];
+                break;
+            }
+         case WEST:
+            {   
+                if(isInBounds (xCoord+1,yCoord))
+                    return manhattan[xCoord+1][yCoord];
+                break;
+              
+            }
+         case NORTH:
+            {   
+                if(isInBounds (xCoord,yCoord+1))
+                    return manhattan[xCoord][yCoord+1];
+                break;
+            }
+
+           
+
+    }
+     return 999;
+}
+
+
+int getMinValOfNeighbors(Mouse*mouse ){
+    int min = 1000;
+    int xCoord = mouse->x;
+    int yCoord = mouse->y;
+    Heading heading = mouse->heading;
+
+    int front = getFrontVal(heading, xCoord,yCoord);
+    int left = getLeftVal(heading, xCoord, yCoord);
+    int right = getRightVal(heading, xCoord, yCoord);
+
+    printf ("front: %d \n left: %d \n right: %d \n", front, left, right);
+    if(front!= 999 && front < min )
+        min = front;
+    if (left !=999 && left < min)
+        min = left;
+    if(right != 999 && right < min)
+        min = right;
+   
+    return min;
+}
+
+
+// int getMinValOfNeighbors(Mouse*mouse ){
+//     int min = 1000;
+//     int xCoord = mouse->x;
+//     int yCoord = mouse->y;
+
+//     Heading heading = mouse->heading;
+//     switch (heading){
+//         case NORTH:
+//             {   
+//                 //front
+//                 if(isInBounds (xCoord+1,yCoord)){
+//                     if (manhattan[xCoord+1,yCoord] < min)
+//                         min = manhattan[xCoord+1,yCoord];
+//                 }
+//                 //right
+//                 if(isInBounds (xCoord,yCoord-1)){
+//                     if (manhattan[xCoord][yCoord-1] < min)
+//                     min = (manhattan[xCoord][yCoord-1];
+//                 }
+//                 //left
+//                 if(isInBounds (xCoord,yCoord+1)){
+//                     if (manhattan[xCoord][yCoord+1] < min)
+//                     min = (manhattan[xCoord][yCoord+1];
+//                 }
+//                 break;
+//             }
+//          case EAST:
+//             {   
+//                 //front
+//                 if(isInBounds (xCoord,yCoord-1)){
+//                     if (manhattan[xCoord,yCoord-1] < min)
+//                         min = manhattan[xCoord,yCoord-1];
+//                 }
+//                 //right
+//                 if(isInBounds (xCoord-1,yCoord)){
+//                     if (manhattan[xCoord-1][yCoord] < min)
+//                     min = (manhattan[xCoord-1][yCoord];
+//                 }
+//                 //left
+//                 if(isInBounds (xCoord+1,yCoord)){
+//                     if (manhattan[xCoord+1][yCoord] < min)
+//                     min = (manhattan[xCoord+1][yCoord];
+//                 }
+//                 break;
+//             }
+//          case WEST:
+//             {   
+//                 //front
+//                 if(isInBounds (xCoord,yCoord+1)){
+//                     if (manhattan[xCoord,yCoord+1] < min)
+//                         min = manhattan[xCoord,yCoord+1];
+//                 }
+//                 //right
+//                 if(isInBounds (xCoord+1,yCoord)){
+//                     if (manhattan[xCoord+1][yCoord] < min)
+//                     min = (manhattan[xCoord+1][yCoord];
+//                 }
+//                 //left
+//                 if(isInBounds (xCoord-1,yCoord)){
+//                     if (manhattan[xCoord-1][yCoord] < min)
+//                     min = (manhattan[xCoord-1][yCoord];
+//                 }
+//                 break;
+//             }
+//          case SOUTH:
+//             {   
+//                 //front
+//                 if(isInBounds (xCoord-1,yCoord)){
+//                     if (manhattan[xCoord-1,yCoord] < min)
+//                         min = manhattan[xCoord-1,yCoord];
+//                 }
+//                 //left
+//                 if(isInBounds (xCoord,yCoord-1)){
+//                     if (manhattan[xCoord][yCoord-1] < min)
+//                     min = (manhattan[xCoord][yCoord-1];
+//                 }
+//                 //right
+//                 if(isInBounds (xCoord,yCoord+1)){
+//                     if (manhattan[xCoord][yCoord+1] < min)
+//                     min = (manhattan[xCoord][yCoord+1];
+//                 }
+//                 break;
+//             }
+
+//     }
+//     return min;
+// }
+
+int isInBounds(int x, int y){
+    if(x < 0 || y < 0 || y > 15 || x > 15)
+        return 0;
+    return 1;
+
+}
+
+void updateWalls(Mouse* mouse){
+    int xCoord = mouse->x;
+    int yCoord = mouse->y;
+
+     printf("X coord is %d\n", xCoord);
+     printf("Y coord is %d\n", yCoord);
+    
 
     if (getFrontReading(mouse)==1){
         if(mouse->heading == NORTH){
