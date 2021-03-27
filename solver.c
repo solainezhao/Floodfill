@@ -110,34 +110,50 @@ Action floodFill(Mouse *mouse)
         printf("\n");
     }
 
-    printf ("\n");
+    printf ("END OF VER ARRAY\n");
+
+        for (int i = 0; i < 17; i++ ){
+        for ( int j = 0; j < 16; j++)
+            printf("%d", horizArray[i][j]);
+        printf("\n");
+    }
+
+    printf ("END OF HORIZARRAY\n");
 
     //check all three neighboring cells for min value
     int min = getMinValOfNeighbors(mouse);
     Heading heading = mouse->heading;
-    int xCoord = mouse->x;
-    int yCoord = mouse->y;
+    int xCoord = mouse->y;
+    int yCoord = mouse->x;
 
-    int man = manhattan[xCoord][yCoord];
+    // int man = manhattan[xCoord][yCoord];
+    // int front = getFrontVal(heading, xCoord,yCoord);
+    // int left = getLeftVal(heading, xCoord, yCoord);
+    // int right = getRightVal(heading, xCoord, yCoord);
+
+     int man = manhattan[xCoord][yCoord];
     int front = getFrontVal(heading, xCoord,yCoord);
     int left = getLeftVal(heading, xCoord, yCoord);
     int right = getRightVal(heading, xCoord, yCoord);
 
-    printf("Front is : %d \n Man is :  %d \n Min is : %d \n FrontAccess: %d", front, man, min ,  frontAccessible(heading,xCoord,yCoord));
+    printf("Front : %d \n Right : \n Man is :  %d \n Min is : %d \n FrontAccess: %d \n LeftAccess: %d \n RightAccess %d \n\n", front, right, man, min ,  frontAccessible(heading,xCoord,yCoord), leftAccessible(heading,xCoord,yCoord), rightAccessible(heading,xCoord,yCoord));
 
     if (front !=999 && front == min && front < man && frontAccessible(heading,xCoord,yCoord) )
         return FORWARD;
     else if(left !=999 && left == min && left < man && leftAccessible(heading,xCoord,yCoord))
         return LEFT;
-    else if (right !=999 && right == min && left < man && rightAccessible(heading,xCoord,yCoord))
-        return RIGHT;
+    else if (right !=999 && right == min && right < man && rightAccessible(heading,xCoord,yCoord)){
+        printf("I SHOULD BE TURNING RIGHT SMFH \n");
+         return RIGHT;
+    }
+       
     else
-        return IDLE;
+        return FORWARD;
 }
 
 int frontAccessible(Heading heading, int xCoord, int yCoord){
     switch(heading){
-        case SOUTH:
+        case NORTH:
         {
                 if(horizArray[xCoord+1][yCoord]!= 1 )
                     return TRUE;
@@ -145,17 +161,17 @@ int frontAccessible(Heading heading, int xCoord, int yCoord){
          }
         case EAST:
         {
-                if(vertArray[xCoord][yCoord]!= 1 )
+                if(vertArray[xCoord][yCoord+1]!= 1 )
                     return TRUE;
                 break;
         }
         case WEST:
         {
-                if(vertArray[xCoord][yCoord+1]!= 1 )
+                if(vertArray[xCoord][yCoord]!= 1 )
                     return TRUE;
                 break;
         }
-          case NORTH:
+          case SOUTH:
         {
                 if(horizArray[xCoord][yCoord]!= 1 )
                     return TRUE;
@@ -170,7 +186,7 @@ int leftAccessible(Heading heading, int xCoord, int yCoord){
     switch(heading){
         case NORTH:
         {
-                if(vertArray[xCoord][yCoord+1]!= 1 )
+                if(vertArray[xCoord][yCoord]!= 1 )
                     return TRUE;
                 break;
          }
@@ -188,7 +204,7 @@ int leftAccessible(Heading heading, int xCoord, int yCoord){
         }
           case SOUTH:
         {
-                if(vertArray[xCoord][yCoord]!= 1 )
+                if(vertArray[xCoord][yCoord+1]!= 1 )
                     return TRUE;
                 break;
         }
@@ -201,7 +217,7 @@ int rightAccessible(Heading heading, int xCoord, int yCoord){
     switch(heading){
         case NORTH:
         {
-                if(vertArray[xCoord][yCoord]!= 1 )
+                if(vertArray[xCoord][yCoord+1]!= 1 )
                     return TRUE;
                 break;
          }
@@ -219,7 +235,7 @@ int rightAccessible(Heading heading, int xCoord, int yCoord){
         }
           case SOUTH:
         {
-                if(vertArray[xCoord][yCoord+1]!= 1 )
+                if(vertArray[xCoord][yCoord]!= 1 )
                     return TRUE;
                 break;
         }
@@ -291,6 +307,7 @@ int getLeftVal(Heading heading,  int xCoord, int yCoord){
             }
          case NORTH:
             {   
+                printf("leftYCOORD: %d \n left XCOORD-1: %d \n", xCoord, yCoord-1);
                 if(isInBounds (xCoord,yCoord-1))
                     return manhattan[xCoord][yCoord-1];
                 break;
@@ -341,8 +358,8 @@ int getRightVal(Heading heading, int xCoord, int yCoord ){
 
 int getMinValOfNeighbors(Mouse*mouse ){
     int min = 1000;
-    int xCoord = mouse->x;
-    int yCoord = mouse->y;
+    int xCoord = mouse->y;
+    int yCoord = mouse->x;
     Heading heading = mouse->heading;
 
     int front = getFrontVal(heading, xCoord,yCoord);
@@ -457,16 +474,16 @@ int isInBounds(int x, int y){
 }
 
 void updateWalls(Mouse* mouse){
-    int xCoord = mouse->x;
-    int yCoord = mouse->y;
+    int xCoord = mouse->y;
+    int yCoord = mouse->x;
 
-     printf("X coord is %d\n", xCoord);
-     printf("Y coord is %d\n", yCoord);
+     printf("Y coord is %d\n", xCoord);
+     printf("X coord is %d\n", yCoord);
     
 
     if (getFrontReading(mouse)==1){
         if(mouse->heading == NORTH){
-            horizArray[xCoord][yCoord] = 1;
+            horizArray[xCoord+1][yCoord] = 1;
         }
         else if(mouse->heading == EAST){
             vertArray[xCoord][yCoord+1] = 1;
@@ -475,7 +492,7 @@ void updateWalls(Mouse* mouse){
             vertArray[xCoord][yCoord]=1;
         }
         else if(mouse->heading ==SOUTH){
-            horizArray[xCoord+1][yCoord]=1;
+            horizArray[xCoord][yCoord]=1;
         }
     }
     if (getLeftReading(mouse)==1){
@@ -483,10 +500,10 @@ void updateWalls(Mouse* mouse){
             vertArray[xCoord][yCoord] = 1;
         }
         else if(mouse->heading == EAST){
-            horizArray[xCoord][yCoord] = 1;
+            horizArray[xCoord+1][yCoord] = 1;
         }
         else if(mouse->heading == WEST){
-            horizArray[xCoord+1][yCoord]=1;
+            horizArray[xCoord][yCoord]=1;
         }
         else if(mouse->heading == SOUTH){
             vertArray[xCoord][yCoord+1] = 1;
@@ -497,10 +514,10 @@ void updateWalls(Mouse* mouse){
             vertArray[xCoord][yCoord+1] = 1;
         }
         else if(mouse->heading == EAST){
-            horizArray[xCoord+1][yCoord] = 1;
+            horizArray[xCoord][yCoord] = 1;
         }
         else if(mouse->heading == WEST){
-            horizArray[xCoord][yCoord]=1;
+            horizArray[xCoord+1][yCoord]=1;
         }
         else if(mouse->heading == SOUTH){
             vertArray[xCoord][yCoord] = 1;
