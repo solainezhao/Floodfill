@@ -95,6 +95,8 @@ Action leftWallFollower(Mouse *mouse)
     else return RIGHT;
 }
 
+int hasTurnedLeft =0;
+int hasTurnedRight=0;
 Action floodFill(Mouse *mouse)
 {
     // TODO: Implement this function!
@@ -131,24 +133,52 @@ Action floodFill(Mouse *mouse)
     // int left = getLeftVal(heading, xCoord, yCoord);
     // int right = getRightVal(heading, xCoord, yCoord);
 
-     int man = manhattan[xCoord][yCoord];
+    int man = manhattan[xCoord][yCoord];
     int front = getFrontVal(heading, xCoord,yCoord);
     int left = getLeftVal(heading, xCoord, yCoord);
     int right = getRightVal(heading, xCoord, yCoord);
 
     printf("Front : %d \n Right : \n Man is :  %d \n Min is : %d \n FrontAccess: %d \n LeftAccess: %d \n RightAccess %d \n\n", front, right, man, min ,  frontAccessible(heading,xCoord,yCoord), leftAccessible(heading,xCoord,yCoord), rightAccessible(heading,xCoord,yCoord));
 
-    if (front !=999 && front == min && front < man && frontAccessible(heading,xCoord,yCoord) )
+
+
+    if(hasTurnedLeft)
+    {
+        hasTurnedLeft = 0;
         return FORWARD;
-    else if(left !=999 && left == min && left < man && leftAccessible(heading,xCoord,yCoord))
-        return LEFT;
-    else if (right !=999 && right == min && right < man && rightAccessible(heading,xCoord,yCoord)){
-        printf("I SHOULD BE TURNING RIGHT SMFH \n");
-         return RIGHT;
     }
-       
-    else
+    else if(hasTurnedRight)
+    {
+        hasTurnedRight =0;
         return FORWARD;
+    }
+    else if(left !=999 && left == min && left < man && leftAccessible(heading,xCoord,yCoord))
+    {
+        hasTurnedLeft = 1;
+        return LEFT;
+    }
+    else if(right !=999 && right == min && right < man && rightAccessible(heading,xCoord,yCoord))
+    {
+        hasTurnedRight = 1;
+        return RIGHT;
+    }
+    else if(front !=999 && front == min && front < man && frontAccessible(heading,xCoord,yCoord))
+        return FORWARD;
+    else return IDLE;
+
+
+    // if()
+    // if (front !=999 && front == min && front < man && frontAccessible(heading,xCoord,yCoord) )
+    //     return FORWARD;
+    // if(left !=999 && left == min && left < man && leftAccessible(heading,xCoord,yCoord))
+    //     return LEFT;
+    // if (right !=999 && right == min && right < man && rightAccessible(heading,xCoord,yCoord)){
+    //     printf("I SHOULD BE TURNING RIGHT SMFH \n");
+    //      return RIGHT;
+    // }
+       
+    
+        // return RIGHT;
 }
 
 int frontAccessible(Heading heading, int xCoord, int yCoord){
